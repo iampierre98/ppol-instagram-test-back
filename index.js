@@ -31,7 +31,10 @@ app.post("/instagram/access-token", async (req, res) => {
     });
     const { access_token } = response.data;
 
-    res.json({ access_token });
+    const largeTokenUrl = `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${CLIENT_SECRET}&access_token=${access_token}`;
+    const largeTokenResponse = await axios.get(largeTokenUrl);
+    const { access_token: largeToken } = largeTokenResponse.data;
+    res.status(200).json({ access_token: largeToken });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error });
