@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
 
 app.post("/instagram/access-token", async (req, res) => {
   try {
-    console.log(CLIENT_ID);
+    console.log(req.body.code);
     const url = "https://api.instagram.com/oauth/access_token";
     const formData = new URLSearchParams();
     formData.append("client_id", CLIENT_ID);
