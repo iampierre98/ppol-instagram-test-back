@@ -29,13 +29,12 @@ app.post("/instagram/access-token", async (req, res) => {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
-    console.log(response);
     const { access_token } = response.data;
 
     res.json({ access_token });
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.log(error);
+    res.status(500).json({ error });
   }
 });
 
