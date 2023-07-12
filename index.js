@@ -17,16 +17,18 @@ app.get("/", (req, res) => {
 app.post("/instagram/access-token", async (req, res) => {
   try {
     console.log(CLIENT_ID);
-    const response = await axios.post(
-      "https://api.instagram.com/oauth/access_token",
-      {
-        client_secret: CLIENT_SECRET,
-        redirect_uri: REDIRECT_URI,
-        code: req.body.code,
-        client_id: CLIENT_ID || req.body.client_id,
-        grant_type: "authorization_code",
-      }
-    );
+    const url = "https://api.instagram.com/oauth/access_token";
+    const formData = new URLSearchParams();
+    formData.append("client_id", CLIENT_ID);
+    formData.append("client_secret", CLIENT_SECRET);
+    formData.append("grant_type", "authorization_code");
+    formData.append("redirect_uri", REDIRECT_URI);
+    formData.append("code", req.body.code);
+    const response = await axios.post(url, formData, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
     console.log(response);
     const { access_token } = response.data;
 
