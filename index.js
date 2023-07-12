@@ -6,7 +6,7 @@ const app = express();
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(morgan("dev"));
-const CLIENT_ID = 302527272340249;
+const CLIENT_ID = "302527272340249";
 const CLIENT_SECRET = "b41098521747baae67653b54554ceb5b";
 const REDIRECT_URI = "https://andres0212.github.io/instagram-test/";
 
@@ -16,13 +16,14 @@ app.get("/", (req, res) => {
 
 app.post("/instagram/access-token", async (req, res) => {
   try {
+    console.log(CLIENT_ID);
     const response = await axios.post(
       "https://api.instagram.com/oauth/access_token",
       {
-        client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
         redirect_uri: REDIRECT_URI,
         code: req.body.code,
+        client_id: CLIENT_ID || req.body.client_id,
         grant_type: "authorization_code",
       }
     );
