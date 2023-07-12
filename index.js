@@ -3,7 +3,7 @@ const axios = require("axios");
 const cors = require("cors");
 const morgan = require("morgan");
 const app = express();
-app.use(cors({ origin: "https://andres0212.github.io/instagram-test/" }));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(morgan("dev"));
 const CLIENT_ID = "302527272340249";
