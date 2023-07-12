@@ -6,7 +6,7 @@ const app = express();
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(morgan("dev"));
-const CLIENT_ID = "302527272340249";
+const CLIENT_ID = 302527272340249;
 const CLIENT_SECRET = "b41098521747baae67653b54554ceb5b";
 const REDIRECT_URI = "https://andres0212.github.io/instagram-test/";
 
@@ -26,7 +26,7 @@ app.post("/instagram/access-token", async (req, res) => {
         grant_type: "authorization_code",
       }
     );
-
+    console.log(response);
     const { access_token } = response.data;
 
     res.json({ access_token });
