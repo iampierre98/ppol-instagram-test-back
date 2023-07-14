@@ -17,7 +17,25 @@ require("dotenv").config();
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(morgan("dev"));
+const https = require("https");
 
+https
+  .get("https://api.ipify.org?format=json", (res) => {
+    let data = "";
+
+    res.on("data", (chunk) => {
+      data += chunk;
+    });
+
+    res.on("end", () => {
+      const ipData = JSON.parse(data);
+      const publicIP = ipData.ip;
+      console.log(publicIP);
+    });
+  })
+  .on("error", (err) => {
+    console.error(err);
+  });
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
