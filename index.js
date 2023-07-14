@@ -25,6 +25,7 @@ const ACCESS_KEY_ID = process.env.ACCESS_KEY_ID;
 const SECRET_ACCESS_KEY = process.env.SECRET_ACCESS_KEY;
 const CLOUDFLARE_ID = process.env.CLOUDFLARE_ID;
 const DOWLOAND_URL = process.env.DOWLOAND_URL;
+const PROXY_URL = process.env.PROXY_URL;
 
 const S3 = new S3Client({
   region: "auto",
@@ -34,6 +35,12 @@ const S3 = new S3Client({
     secretAccessKey: SECRET_ACCESS_KEY,
   },
 });
+
+const getProxy = async () => {
+  const response = await axios.get(PROXY_URL);
+  //this will return a txt with the proxies
+  return response.data;
+};
 
 //Axios para guardar los archivos
 const getNewUrl = async (url, username, mediaId) => {
@@ -89,12 +96,22 @@ app.post("/instagram/", async (req, res) => {
       if (usernameClean.includes("/")) {
         usernameClean = usernameClean.split("/")[0];
       }
+    } else if (username.includes("@")) {
+      usernameClean = username.split("@")[1];
     } else {
       usernameClean = username;
     }
+    let proxy = await getProxy();
+
+    const proxyConfig = {
+      host: proxy.split(":")[0],
+      port: proxy.split(":")[1],
+      // Add any other proxy configuration options if needed
+    };
     const response = await axios.get(
       `https://www.instagram.com/api/v1/users/web_profile_info/?username=${usernameClean}`,
       {
+        proxys: proxyConfig,
         headers: {
           "X-Ig-App-Id": "936619743392459",
         },
@@ -108,24 +125,27 @@ app.post("/instagram/", async (req, res) => {
       profile_pic_url,
       fbid,
     } = response.data.data.user;
-    const profile_url = await new Promise(async (resolve, reject) => {
+    let profile_url = `https://www.instagram.com/${usernameClean}/`;
+    let img_profile_url = await new Promise(async (resolve, reject) => {
       await getNewUrl(profile_pic_url, usernameClean, fbid).then((url) => {
         resolve(url);
       });
     });
-    const media = data.map((item) => {
+    const media = data.slice(0, 6).map((item) => {
       const {
         thumbnail_resources,
         is_video,
         edge_media_to_caption,
         id: mediaId,
+        shortcode,
       } = item.node;
+      let imgUrl = `https://www.instagram.com/p/${shortcode}`;
       let caption = "";
       let display_url = thumbnail_resources[0].src;
       if (edge_media_to_caption.edges.length > 0) {
         caption = edge_media_to_caption.edges[0].node.text;
       }
-      return { display_url, caption, is_video, mediaId };
+      return { display_url, caption, is_video, mediaId, imgUrl };
     });
     const mediaUrl = await Promise.all(
       media.map(async (item) => {
@@ -138,6 +158,8 @@ app.post("/instagram/", async (req, res) => {
           display_url,
           caption: item.caption,
           is_video: item.is_video,
+          mediaId: item.mediaId,
+          imgUrl: item.imgUrl,
         };
       })
     );
@@ -145,6 +167,8 @@ app.post("/instagram/", async (req, res) => {
       name,
       biography,
       followers: followers.count,
+      img_profile_url,
+      username,
       profile_url,
     };
     res.status(200).json({ userData, media: mediaUrl });
