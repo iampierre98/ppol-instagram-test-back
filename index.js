@@ -102,7 +102,7 @@ app.post("/instagram/", async (req, res) => {
       usernameClean = username;
     }
     let proxy = await getProxy();
-
+    console.log(proxy);
     const proxyConfig = {
       host: proxy.split(":")[0],
       port: proxy.split(":")[1],
