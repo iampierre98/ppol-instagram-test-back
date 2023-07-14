@@ -126,9 +126,9 @@ app.post("/instagram/", async (req, res) => {
     };
     const response = await axios.get(`https://www.instagram.com`, {
       proxys: proxyConfig,
-      headers: {
-        "X-Ig-App-Id": "936619743392459",
-      },
+      // headers: {
+      //   "X-Ig-App-Id": "936619743392459",
+      // },
     });
     res.status(200).json(response.data);
     const data = response.data.data.user.edge_owner_to_timeline_media.edges;
