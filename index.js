@@ -101,11 +101,9 @@ app.post("/instagram/", async (req, res) => {
     } else {
       usernameClean = username;
     }
-    let proxy = await getProxy();
-    console.log(proxy);
     const proxyConfig = {
-      host: proxy.split(":")[0],
-      port: proxy.split(":")[1],
+      host: "170.106.158.134",
+      port: 31039,
       // Add any other proxy configuration options if needed
     };
     const response = await axios.get(
@@ -117,6 +115,7 @@ app.post("/instagram/", async (req, res) => {
         },
       }
     );
+    console.log(response);
     const data = response.data.data.user.edge_owner_to_timeline_media.edges;
     const {
       full_name: name,
