@@ -126,9 +126,18 @@ app.post("/instagram/", async (req, res) => {
     };
     const response = await axios.get(`https://www.instagram.com`, {
       proxys: proxyConfig,
-      // headers: {
-      //   "X-Ig-App-Id": "936619743392459",
-      // },
+      headers: {
+        "X-Ig-App-Id": "936619743392459",
+        "X-Ig-Device-ID": "a5b8c4f6-7d8f-4b9e-9e4c-6a4a8d5e7f8a",
+        "X-IG-Connection-Type": "WIFI",
+        "X-IG-Capabilities": "3brTvw==",
+        "X-IG-App-Locale": "en_US",
+        "X-IG-Device-Locale": "en_US",
+        "X-FB-HTTP-Engine": "Liger",
+        "User-Agent": "Chrome/81.0.4044.138 Mobile Safari/537.36",
+        "Accept-Language": "en-US",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+      },
     });
     res.status(200).json(response.data);
     const data = response.data.data.user.edge_owner_to_timeline_media.edges;
