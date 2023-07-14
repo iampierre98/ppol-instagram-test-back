@@ -101,11 +101,9 @@ app.post("/instagram/", async (req, res) => {
     } else {
       usernameClean = username;
     }
-    let proxy = await getProxy();
-    console.log(proxy);
     const proxyConfig = {
-      host: proxy.split(":")[0],
-      port: proxy.split(":")[1],
+      host: "user-instagram-region-pe:micarro20:na.lunaproxy.com",
+      port: 12233,
       // Add any other proxy configuration options if needed
     };
     const response = await axios.get(
