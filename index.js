@@ -124,16 +124,13 @@ app.post("/instagram/", async (req, res) => {
       port: 31039,
       // Add any other proxy configuration options if needed
     };
-    const response = await axios.get(
-      `https://www.instagram.com/api/v1/users/web_profile_info/?username=${usernameClean}`,
-      {
-        proxys: proxyConfig,
-        headers: {
-          "X-Ig-App-Id": "936619743392459",
-        },
-      }
-    );
-    console.log(response);
+    const response = await axios.get(`https://www.instagram.com`, {
+      proxys: proxyConfig,
+      headers: {
+        "X-Ig-App-Id": "936619743392459",
+      },
+    });
+    res.status(200).json(response.data);
     const data = response.data.data.user.edge_owner_to_timeline_media.edges;
     const {
       full_name: name,
@@ -190,7 +187,7 @@ app.post("/instagram/", async (req, res) => {
     };
     res.status(200).json({ userData, media: mediaUrl });
   } catch (error) {
-    console.log(error);
+    res.status(500).json({ error });
   }
   // try {
   //   axios
