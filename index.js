@@ -5,6 +5,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const fs = require("fs");
 const app = express();
+const { SocksProxyAgent } = require("socks-proxy-agent");
 const {
   S3Client,
   ListBucketsCommand,
@@ -17,25 +18,7 @@ require("dotenv").config();
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(morgan("dev"));
-const https = require("https");
 
-https
-  .get("https://api.ipify.org?format=json", (res) => {
-    let data = "";
-
-    res.on("data", (chunk) => {
-      data += chunk;
-    });
-
-    res.on("end", () => {
-      const ipData = JSON.parse(data);
-      const publicIP = ipData.ip;
-      console.log(publicIP);
-    });
-  })
-  .on("error", (err) => {
-    console.error(err);
-  });
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
@@ -119,27 +102,18 @@ app.post("/instagram/", async (req, res) => {
     } else {
       usernameClean = username;
     }
-    const proxyConfig = {
-      host: "170.106.158.134",
-      port: 31039,
-      // Add any other proxy configuration options if needed
-    };
-    const response = await axios.get(`https://www.instagram.com`, {
-      proxys: proxyConfig,
-      headers: {
-        "X-Ig-App-Id": "936619743392459",
-        "X-Ig-Device-ID": "a5b8c4f6-7d8f-4b9e-9e4c-6a4a8d5e7f8a",
-        "X-IG-Connection-Type": "WIFI",
-        "X-IG-Capabilities": "3brTvw==",
-        "X-IG-App-Locale": "en_US",
-        "X-IG-Device-Locale": "en_US",
-        "X-FB-HTTP-Engine": "Liger",
-        "User-Agent": "Chrome/81.0.4044.138 Mobile Safari/537.36",
-        "Accept-Language": "en-US",
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-      },
-    });
-    res.status(200).json(response.data);
+    /* initialize proxy configuration */
+    const torProxyAgent = new SocksProxyAgent(PROXY_URL);
+    const response = await axios.get(
+      `https://www.instagram.com/api/v1/users/web_profile_info/?username=${usernameClean}`,
+      {
+        headers: {
+          "X-Ig-App-Id": "936619743392459",
+        },
+        httpsAgent: torProxyAgent,
+        htppAgent: torProxyAgent,
+      }
+    );
     const data = response.data.data.user.edge_owner_to_timeline_media.edges;
     const {
       full_name: name,
@@ -197,6 +171,7 @@ app.post("/instagram/", async (req, res) => {
     res.status(200).json({ userData, media: mediaUrl });
   } catch (error) {
     res.status(500).json({ error });
+    console.error(error);
   }
   // try {
   //   axios
